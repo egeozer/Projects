@@ -1,0 +1,395 @@
+import java.util.ArrayList;
+import java.util.Collections;
+
+public class tester {
+	public static void main(String[] args) {
+	
+	class Number{
+		short Base; 
+		short[] Int,NonRep,Rep;
+	//=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+		// your method for converting belongs here...
+		
+		//Multiplication method where two Integer ArrayLists and one short are accepted, 
+		//a and b being numbers multiplying each other and m being the base that the multiplication is done.
+		
+		public  ArrayList multiply(ArrayList<Integer> a, ArrayList<Integer> b,int m){	
+			ArrayList temp = new ArrayList<Integer>();
+			ArrayList temp2 = new ArrayList<Integer>();
+		
+			int carry = 0;
+			for(int i = 0 ; i< (a.size()+b.size());i++){	//here, I create an array temp2 sized of the product of a and b filled with 0's 
+				temp2.add((int)0);								//in order to easily edit each element later on
+				
+			}
+			for(int i = 0; i<b.size();i++){						//each digit in each number is multiplied by each other then added immediately to temp2.
+				for(int j = 0; j<a.size();j++){					//unlike how we, humans calculate,by adding each rows altogether at the end
+					if(j==a.size()-1 &&( b.get(i)*a.get(j))>=m){	//I add them every time the index of b(outer for loop) has increased(saves memory)
+					
+						temp.add((int)((int)(b.get(i)*a.get(j))%m+carry));
+					
+						carry= (int) (((b.get(i)*a.get(j))-(b.get(i)*a.get(j))%m)/m);	//Every multiplication operation depends on the base m
+					
+						temp.add(carry);
+					
+					
+					}
+					else{
+						temp.add((int)((b.get(i)*a.get(j))%m+carry)); //temp is the temporary variable where 
+																		//it contains the numbers to be added to temp2(result)
+						
+					
+						carry= (int) (((b.get(i)*a.get(j))-(b.get(i)*a.get(j))%m)/m);
+					
+					
+					}
+					
+				
+				}
+				
+				carry=0;
+				
+				for(int j = 0; j<temp.size();j++){	//temp2 is modified(added with the previous 
+													//temp2 and temp) everytime the outer loop(digits of b) goes to the next
+					
+					temp2.set(j, ((int)temp2.get(j)+(int)temp.get(j))  );
+			
+				}
+				for(int j = 0; j<temp.size();j++){
+				
+					if((int)temp2.get(j)>=m ){
+					
+						temp2.set(j, (int)temp2.get(j)%m);
+					
+					
+						temp2.set(j+1, (int)temp2.get(j+1)+1);
+				
+					}
+				}
+				temp.clear();	//temp is cleared at the end of each forloop(b is done multiplying with one of the digit)
+				
+				for(int j = 0; j<i+1;j++){	//this is where the "shifting" done basically by adding a 0 everytime b has went to the next digit
+					
+				
+					temp.add((int)0);
+				
+				}
+					
+			}
+	
+			return temp2;
+	
+		}
+		
+		//This method calculates the non Fraction part(X) of the input
+			//The algorithm is basically shifting numbers to the right by respecting the wanted base
+		//This method takes a short[] input which is the starting input number, the starting base(d) and the wanted base(e)
+			//The reason why I work with Integer Arrays is because I started this assignment before the "tester" method, and 
+		//I asked the teacher and he did not mind at all, so I kept Integer, I'm getting and returning in short now so it works with "tester"
+	
+		public short[] nonFraction(short[] inputA, short d ,short e){
+			
+			ArrayList<Integer> input = new ArrayList<Integer> ();
+			int a = 0;
+			int b = 0;
+			for(int i = 0 ; i< inputA.length;i++){	//transforming short to Integer, but later returned casted in short and returned in short
+				input.add( (int)inputA[i]);
+			}
+			
+			if(input.size()==1)
+				input.add(0);
+			a=(int)d;
+			b=(int)e;
+			
+			
+			ArrayList<Integer> temp = new ArrayList<Integer> ();
+			ArrayList<Integer> remainders = new ArrayList<Integer> ();	//where the result is stored, whenever the index reaches 
+																		//the end and the remainder of that digit by respecting the base is stored in remainders
+			
+			int carry = 0;
+			int c = 0;
+			
+			
+			
+			while(c!=input.size()){
+				c=0;
+				for(int i = 0;i<input.size();i++){
+					if(input.get(i).equals(0)){
+						c++;	//everytime c equals 0 it is counted and if ever that count reaches the length of the input, it means that
+							//there is nothing to divide(input is 0) so stop dividing
+					}
+				}
+						
+						
+				for(int i =input.size()-1 ; i>0;i--){
+				
+					temp.add(input.get(i)/b);
+				
+					carry = (input.get(i)%b)*a;
+				
+				
+					input.set(i-1, input.get(i-1)+carry);
+				
+				
+				if(i==1){
+					temp.add(input.get(i-1)/b);
+					
+					remainders.add((input.get(i-1)%b));
+				
+				}
+				
+			}
+						
+						
+				Collections.reverse(temp);	//Here I use Collections to reverse the array so that my returned value is not reversed for tester
+						
+				input=new ArrayList(temp);
+						
+				temp.clear();
+						
+			}
+			
+			short[] shortRemainders = new short[remainders.size()] ;	//where the array got converted to short to return short
+			for(int i = 0; i<remainders.size();i++)
+				shortRemainders[i]=remainders.get(i).shortValue();
+			return shortRemainders;
+			
+			
+		}
+			//this method converts a short array into a short value
+			//keep in mind this is not used for more than 1 digit so that it does not cause runtime errors
+		public int shortValue(short[] input ){
+			String s = "";
+			for(int i =0;i<input.length;i++)
+				
+				s+=input[input.length-1-i];
+			
+				
+			return Short.parseShort(s);
+			
+			
+		}
+		//this method does the inverse of the previous method, by converting a short to a short array
+		public  short[] shortToArray(short n ){
+			String s = ""+n;
+			short[] m = new short[s.length()];
+			for(int i = s.length()-1;i>=0;i--)
+				m[i]=(short) (Character.getNumericValue(s.charAt(s.length()-1-i)));
+			
+				 return m;
+			
+			
+		}
+		//this method is for the non repeating and the repeating part of the number inputted. It is mostly done by multiplying the inputA
+			//by the base, save the result in a temp variable, and finally save the number that is on the left side of the comma.
+			//this will loop either until the multiplication reaches 0, or until a pattern. The pattern is found by checking the temp varibale containing
+			//arrays each time the multiplication is made. If the same occurence of numbers occur, the loop will break and this will create non repeating
+			//and repeating parts
+			//this method returns an Array type Object since I return two arrays: one for repeating, the other for non repeating
+			//this method takes short array as input for the input fractional part, a short d , which is the base number of input and short e
+			//which is the wanted base
+		public Object[] factors(short[] inputA ,short d, short e){
+			boolean hasRep = false;
+			String s = "";
+			ArrayList input = new ArrayList<Integer>();
+			int a = 0;
+			int b = 0;
+			int size = 0;
+			for(int i = 0 ; i< inputA.length;i++){
+				input.add( (int)inputA[i]);
+			}
+			a=(int)d;
+			b=(int)e;
+			
+				
+			 s = b+"";										//s is a string containing b, so it's easier to play with
+			ArrayList n = new ArrayList<Integer>(); 		//n is the value of e, but as an array
+			ArrayList temp = new ArrayList<Integer>();
+			ArrayList temp2 = new ArrayList<Integer>();
+			ArrayList zeros = new ArrayList<Integer>();
+			ArrayList arrays = new ArrayList();
+			ArrayList nonrep = new ArrayList();
+			
+			
+			for(int i = 0;i<input.size();i++)	//here a model array of 0's created so that it's easier to determine if an array has reached 0
+				zeros.add(0);
+			for(int i = s.length()-1;i>=0;i--){
+				n.add(Character.getNumericValue(s.charAt(i)));		//each digit is added into the n array
+
+			}
+			if(a<10 && a<b){	//this section implies only when the base starting with is smaller than 10 and also if its smaller than 10
+								//since say 3 is not known in binary so it is converted to that base
+		
+				short[] arra=(nonFraction(shortToArray(e),(short)10,d));
+				ArrayList<Integer> m = new  ArrayList<Integer>();
+				for(int i = 0 ;i<arra.length;i++){
+					m.add((int)arra[i]);
+				}
+				for(int i = 0 ;i<m.size();i++){
+					
+				}
+				
+				n.clear();
+				n=m;
+		
+			}
+		
+			int repStartsAt = 0;
+			outer:for(int i = 0; i<Math.pow(a,input.size());i++ ){ 	//this loop loops for a^input.size like stating in instructions
+					//however, it is usually ended before since there is usually a repeated part or not(end with 0)
+
+				temp=new ArrayList(multiply(input,n,a));
+			 
+			
+				size=temp.size()-input.size();
+
+				 
+				String ss = "";
+				 
+				for(int j = 0 ;j<size;j++){
+				  
+					ss += ""+(temp.get(temp.size()-1-j));
+				 
+				 
+				}
+				 for(int j = 0 ;j<size;j++){
+					 
+					  
+					 temp.remove(temp.size()-1);
+					 }
+				 
+				 temp2.add(Integer.parseInt(ss));
+				 
+				 
+				 input=temp;
+				 if(arrays.contains(temp)){	//checks if the multiplied product is also in the arrays array which contains the previous products
+					 repStartsAt=(arrays.indexOf(temp));	//if it contains the same, the index that the repetition first starts gets saved
+					 										//and the outer for loops breaks.
+					 hasRep=true;
+					 break outer;
+				 }
+				 arrays.add(temp);
+				 
+				 
+			 
+			 
+			 if(zeros.equals(temp)){	//this checks if the array is zero in every digit to see if the product is 0, if it is , then breaks
+				
+				 break;
+			}
+	
+			}
+			String stringOfeachNumber = "";	//this string stores each number in the given base, it is then converted to the wanted base
+			ArrayList array = new ArrayList<Integer>();
+			if(a<10&& a<b){	//again, this is only necessary only if the condition is stated on the left
+			
+				for(int i = 0 ;i<temp2.size();i++){
+				
+					stringOfeachNumber=temp2.get(i)+"";
+			
+					short[] arr = new short[stringOfeachNumber.length()];
+				
+					for(int j = 0; j<stringOfeachNumber.length();j++){
+					
+						arr[j]=(short) (Character.getNumericValue(stringOfeachNumber.charAt(stringOfeachNumber.length()-1-j)));
+								
+					}
+				
+				array.add(shortValue(nonFraction(arr,d,e)));
+				
+				}
+		
+			
+				temp2=new ArrayList(array);
+			
+			
+			}
+			if(hasRep){
+				
+			
+				for(int i = 0; i<repStartsAt+1;i++){				
+				
+					nonrep.add(temp2.get(i));
+				
+			}
+			
+			if(nonrep.size()>=1)
+			
+				for(int i = 0; i<nonrep.size();i++)
+				
+					temp2.remove(0);
+			}
+			else
+				for(int i = 0; i<temp2.size();i++)
+					nonrep.add(temp2.get(i));
+			
+			Collections.reverse(nonrep);	//collected arrays are flipped to match tester
+			Collections.reverse(temp2);
+			
+			short[] shortNonRep = new short[nonrep.size()] ;
+			for(int i = 0; i<nonrep.size();i++)
+				shortNonRep[i]=((Integer) nonrep.get(i)).shortValue();
+			
+			short[] shortRep = new short[temp2.size()] ;
+			if(hasRep)
+			
+				for(int i = 0; i<temp2.size();i++)
+				
+					shortRep[i]=((Integer) temp2.get(i)).shortValue();
+			
+				
+				
+			Object[] nonAndRepArrays = new Object[2];	//nonRep and repeated numbers are shares into their own arrays
+			nonAndRepArrays[0]=shortNonRep;
+			nonAndRepArrays[1]=shortRep;
+			
+				return nonAndRepArrays;
+				
+				
+			}
+	//=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+		public Number convert(Number A, short Base) {
+			Number B=new Number();
+		    	B.Base=Base;
+	    		B.Int=A.NonRep; 
+	    		B.Int=nonFraction(A.Int,A.Base,Base);
+	    		B.NonRep=(short[]) factors(A.NonRep,A.Base, Base)[0];
+	    		B.Rep=(short[]) factors(A.NonRep,A.Base, Base)[1];;
+	    	// my code above is just to make sure it compiles and runs
+	    	return B;
+	    	}
+	//=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+	    
+	    public void printShortArray(short[] S) {
+	        for (int i = S.length-1; i>=0; i--) {
+	        	System.out.print(S[i]);
+	        }
+	    }   
+	    public void printNumber(Number N) {
+	        System.out.print("(");
+	        N.printShortArray(N.Int);
+	        System.out.print(".");
+	        N.printShortArray(N.NonRep);
+	        System.out.print("{");
+	        N.printShortArray(N.Rep);
+	        System.out.print("})_");
+	        System.out.println(N.Base);
+	    }
+		
+	};
+	
+Number N1=new Number() ;
+    	N1.Base=10; N1.Int=new short[2]; N1.NonRep=new short[3];
+    	N1.Int[1]=1; N1.Int[0]=9;
+    	N1.NonRep[2]=2; N1.NonRep[1]=4; N1.NonRep[0]=7;
+    	N1.Rep=new short[0];
+    	N1.printNumber(N1);
+    
+    	Number N2=new Number() ;
+    	short R=2;
+    	N2=N1.convert(N1,R);
+    	N2.printNumber(N2);
+
+	}
+
+}
